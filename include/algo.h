@@ -20,7 +20,7 @@ class algo {
 
 public:
     algo();
-    void init(geometry_msgs::PoseStamped start, geometry_msgs::PoseWithCovarianceStamped goal, nav_msgs::OccupancyGrid::Ptr grid);
+    void init(geometry_msgs::PoseWithCovarianceStamped start, geometry_msgs::PoseStamped goal, nav_msgs::OccupancyGrid::Ptr grid);
     void prune_neibours(node* node);
     void jps();
     void jump(node* curr_n, node* neibour);

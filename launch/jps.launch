@@ -1,7 +1,11 @@
 <launch>
  <!-- Turn on hybrid_astar node -->
  <node name="jps" pkg="jps" type="jps" /> 
+<<<<<<< HEAD
+ <node name="tf_broadcaster_jps" pkg="jps" type="tf_broadcaster_jps" />
+=======
  <node name="tf_broadcaster" pkg="jps" type="tf_broadcaster_jps" />
+>>>>>>> 6f6020432295ecc7f719c9778f7309a93b014121
  <node name="map_server" pkg="map_server" type="map_server" args="$(find jps)/maps/map.yaml" />
  <node name="rviz" pkg="rviz" type="rviz" args="-d $(env HOME)/.rviz/path_planner.rviz" />
 </launch>

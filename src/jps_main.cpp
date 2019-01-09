@@ -21,18 +21,21 @@ void jps_main::process() {
 }
 
 void jps_main::set_map(const nav_msgs::OccupancyGrid::Ptr map){
-    ROS_INFO("map taken");
+
+    ///проверять не старая ли карта
     grid = map;
+    process();
 }
 
 //TODO: проверка на валидную цель
-void jps_main::set_start(const geometry_msgs::PoseStamped::ConstPtr& start) {
-    ROS_INFO("start taken");
+void jps_main::set_start(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& start) {
     this->start = *start;
+    process();
 }
 
+
 //TODO: проверка на валидную цель
-void jps_main::set_goal(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& goal) {
+void jps_main::set_goal(const geometry_msgs::PoseStamped::ConstPtr& goal) {
     ROS_INFO("goal taken");
     this->goal = *goal;
 }

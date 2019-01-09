@@ -34,9 +34,10 @@ class jps_main {
     /// A pointer to the grid the planner runs on
     nav_msgs::OccupancyGrid::Ptr grid;
     /// The start pose set through RViz
-    geometry_msgs::PoseStamped start;
+    geometry_msgs::PoseWithCovarianceStamped start;
     /// The goal pose set through RViz
-    geometry_msgs::PoseWithCovarianceStamped goal;
+    geometry_msgs::PoseStamped goal;
+
 
 
     ros::Publisher pubPath;
@@ -64,12 +65,8 @@ public:
     void process();
 
     void set_map(const nav_msgs::OccupancyGrid::Ptr map);
-    void set_start(const geometry_msgs::PoseStamped::ConstPtr& start);
-    void set_goal(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& goal);
-
-
-
-
+    void set_start(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& start);
+    void set_goal(const geometry_msgs::PoseStamped::ConstPtr& goal);
 
 };
 

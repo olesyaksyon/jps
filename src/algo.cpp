@@ -13,11 +13,12 @@ algo::algo(){
     grid = NULL;
 }
 
-void algo::init(geometry_msgs::PoseStamped start_, geometry_msgs::PoseWithCovarianceStamped goal_, nav_msgs::OccupancyGrid::Ptr grid){
-    float t_st = tf::getYaw(start_.pose.orientation);
-    float t_g = tf::getYaw(goal_.pose.pose.orientation);
-    start.reset(new node(start_.pose.position.x, start_.pose.position.y, t_st, NULL, 0));
-    goal.reset(new node(goal_.pose.pose.position.x, goal_.pose.pose.position.y, t_g, NULL, 0));
+void algo::init(geometry_msgs::PoseWithCovarianceStamped start_, geometry_msgs::PoseStamped goal_, nav_msgs::OccupancyGrid::Ptr grid){
+    ROS_ERROR("init..");
+    float t_st = tf::getYaw(start_.pose.pose.orientation);
+    float t_g = tf::getYaw(goal_.pose.orientation);
+    start.reset(new node(start_.pose.pose.position.x, start_.pose.pose.position.y, t_st, NULL, 0));
+    goal.reset(new node(goal_.pose.position.x, goal_.pose.position.y, t_g, NULL, 0));
     this->grid = grid;
 }
 
@@ -25,13 +26,18 @@ void algo::init(geometry_msgs::PoseStamped start_, geometry_msgs::PoseWithCovari
 
 void algo::jps(){
     if (!start || !goal || !grid) {
-        ROS_ERROR("the class was not inited! check inited start, goal, grid");
         return;
     }
 
+    if (grid)
+        ROS_ERROR("map taken");
+    if (start)
+        ROS_ERROR("start taken");
+    if (goal)
+        ROS_ERROR("goal taken");
 
+    }
 
-}
 
 void algo::clear(){
     path.clear();
