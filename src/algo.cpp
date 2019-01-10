@@ -8,12 +8,10 @@
 
 
 algo::algo(){
-    start = NULL;
-    goal = NULL;
     grid = NULL;
 }
 
-void prune_neibours(node* node){
+void algo::prune_neibours(std::shared_ptr<node> curr_){
 
 }
 
@@ -21,17 +19,35 @@ void algo::init(geometry_msgs::PoseWithCovarianceStamped start_, geometry_msgs::
     ROS_ERROR("init..");
     float t_st = tf::getYaw(start_.pose.pose.orientation);
     float t_g = tf::getYaw(goal_.pose.orientation);
-    start.reset(new node(start_.pose.pose.position.x, start_.pose.pose.position.y, t_st, NULL, 0));
-    goal.reset(new node(goal_.pose.position.x, goal_.pose.position.y, t_g, NULL, 0));
+    start = std::make_shared<node>(start_.pose.pose.position.x, start_.pose.pose.position.y, t_st, std::weak_ptr<node>(), 0);
+    goal = std::make_shared<node>(goal_.pose.position.x, goal_.pose.position.y, t_g, std::weak_ptr<node>(), 0);
     this->grid = grid;
 }
 
 
 
+std::shared_ptr<node> algo::jump(std::shared_ptr<node> curr_n){
+    while (1) {
+        if (curr_n)
+
+
+
+    }
+}
+
+
+
 void algo::jps(){
-    if (!start || !goal || !grid) {
+    if (start.expired() || goal.expired() || !grid) {
         return;
     }
+
+    auto curr_ = start.lock();
+
+    //выбираем по эвристике направление
+
+    //jump
+
 
 
 
@@ -40,7 +56,7 @@ void algo::jps(){
 
 void algo::clear(){
     path.clear();
-    start.release();
-    goal.release();
+    start.reset();
+    goal.reset();
     grid = NULL;
 }

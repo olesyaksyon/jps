@@ -52,10 +52,6 @@ class jps_main {
     /// Vehicle data structure for visualization
     visualization_msgs::MarkerArray pathVehicles;
 
-
-    ///===========================================
-
-    ///==========local vars========================
     algo algo_;
     //path handler
 

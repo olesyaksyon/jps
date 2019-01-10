@@ -12,40 +12,35 @@ y(y),
 t(t),
 dir(dir)
 {
-    std::shared_ptr<node> prev_ = prev.lock();
-    if (prev_) {
 
+    if (!prev.expired()) {
+        std::shared_ptr<node> prev_ = prev.lock();
         g = prev_->g;
-
-        if (dir == prev_->dir)
-            g += config::penalty_forward;
-
-        if (dir != prev_->dir && dir < 3) {
-            dir < prev_->dir ? prev_->dir = dir - 1 : prev_->dir = dir + 1;
-            g += config::penalty_rotate;
-        }
 
         if (dir > 3) {
             g += config::penalty_backwards;
+
+            if (dir == 3 || dir == 5)
+                g += config::penalty_rotate;
         }
 
-        if (dir > 3 && prev_->dir > 3 && prev_->dir != dir) {
+
+        else if (prev_->dir != dir)
             g += config::penalty_rotate;
-
-            dir < prev_->dir ? prev_->dir = dir - 1 : prev_->dir = dir + 1;
-        }
     }
-
 
 
     else
         g = 1;
 
-    this->prev = prev_;
+
+    conctruct_neighbours();
+
 }
 
 void node::conctruct_neighbours(){
     for (int i = 0; i < 6; i ++) {
+        ///map - ключ g
 
     }
 }
