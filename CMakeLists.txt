@@ -30,11 +30,10 @@ find_package(catkin REQUIRED COMPONENTS
 
 set(SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/src/jps_main.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/config.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/algo.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/node.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp
-        )
+        src/map_handler.cpp include/map_handler.h)
 
 include_directories(
         include

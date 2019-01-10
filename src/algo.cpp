@@ -13,6 +13,10 @@ algo::algo(){
     grid = NULL;
 }
 
+void prune_neibours(node* node){
+
+}
+
 void algo::init(geometry_msgs::PoseWithCovarianceStamped start_, geometry_msgs::PoseStamped goal_, nav_msgs::OccupancyGrid::Ptr grid){
     ROS_ERROR("init..");
     float t_st = tf::getYaw(start_.pose.pose.orientation);
@@ -29,12 +33,7 @@ void algo::jps(){
         return;
     }
 
-    if (grid)
-        ROS_ERROR("map taken");
-    if (start)
-        ROS_ERROR("start taken");
-    if (goal)
-        ROS_ERROR("goal taken");
+
 
     }
 

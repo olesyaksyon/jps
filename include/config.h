@@ -5,21 +5,14 @@
 #ifndef JPS_CONFIG_H
 #define JPS_CONFIG_H
 
+namespace config {
+    ///пусть расстояние между колёсами будет 3, тогда на поворот закладываем 4
+    int min_dist_to_obstacle = 4;
 
-class config {
-    int robot_w;//for obstacles
-    int robot_h;
-    //TODO: metres to coords
-    int min_distance_to_obstacle; //in coords
-
-
-public:
-    config(int robot_w, int robot_h);
-
-
-
-
-};
+    float penalty_rotate = 1.05;
+    float penalty_backwards = 2.0;
+    float penalty_forward = 0.2;
+}
 
 
 #endif //JPS_CONFIG_H

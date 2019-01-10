@@ -5,8 +5,13 @@
 #ifndef JPS_NODE_H
 #define JPS_NODE_H
 
-///здесь заготовки для dir
-///dir путь будут глобальными переменными
+#include <memory>
+#include <vector>
+
+///dirs
+///3         0
+///4  point  1
+///5         2
 
 class node {
     float x;
@@ -17,12 +22,18 @@ class node {
     float g;
     float h;
 
-    node * prev;
+    int dir;
+
+    std::weak_ptr<node> prev;
+
     ///array
 
 public:
-    node(float x, float y, float t, node * prev, int dir) {}
-    node* getNeibour(int dir);
+    std::vector<std::weak_ptr<node>> neighbours;
+
+    node(float x, float y, float t, std::weak_ptr<node> prev, int dir);
+    void conctruct_neighbours();
+    float get_g();
 
 
 

@@ -21,7 +21,7 @@ class algo {
 public:
     algo();
     void init(geometry_msgs::PoseWithCovarianceStamped start, geometry_msgs::PoseStamped goal, nav_msgs::OccupancyGrid::Ptr grid);
-    void prune_neibours(node* node);
+    void prune_neibours(std::unique_ptr<node> curr_node, std::vector<std::unique_ptr<node>> neighbours);
     void jps();
     void jump(node* curr_n, node* neibour);
     float countH(node* curr_n, node* neibour);
