@@ -16,15 +16,18 @@ class algo {
     std::weak_ptr<node> goal;
     nav_msgs::OccupancyGrid::Ptr grid;
 
-    std::vector<std::unique_ptr<node>> path;
+    std::list<std::weak_ptr<node>> path;
 
 public:
     algo();
     void init(geometry_msgs::PoseWithCovarianceStamped start, geometry_msgs::PoseStamped goal, nav_msgs::OccupancyGrid::Ptr grid);
+    float distance_to_goal(std::shared_ptr<node> n1);
     void prune_neibours(std::shared_ptr<node> curr_);
+    float get_goal_distance(std::shared_ptr<node> curr_);
+    std::shared_ptr<node> choose_direction(std::shared_ptr<node> curr_);
     void jps();
     bool is_dominant(std::shared_ptr<node> curr, std::shared_ptr<node> next);
-    std::shared_ptr<node> jump(std::shared_ptr<node> curr_n);
+    void jump(std::shared_ptr<node>& curr_n);
     float countH(node* curr_n, node* neibour);
     void clear();
 
