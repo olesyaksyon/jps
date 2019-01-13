@@ -9,7 +9,6 @@ jps_main::jps_main(){
     subMap = n.subscribe("/map", 1, &jps_main::set_map, this);
     subGoal = n.subscribe("/move_base_simple/goal", 1, &jps_main::set_goal, this);
     subStart = n.subscribe("/initialpose", 1, &jps_main::set_start, this);
-
 }
 
 
@@ -17,7 +16,11 @@ jps_main::jps_main(){
 void jps_main::process() {
     algo_.clear();
     algo_.init(start, goal, grid);
-    algo_.jps();
+    std::shared_ptr<node> last = algo_.jps();
+
+    if (last != nullptr) {
+
+    }
 }
 
 void jps_main::set_map(const nav_msgs::OccupancyGrid::Ptr map){

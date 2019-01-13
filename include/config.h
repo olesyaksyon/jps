@@ -6,12 +6,12 @@
 #define JPS_CONFIG_H
 
 namespace config {
-    ///пусть расстояние между колёсами будет 3, тогда на поворот закладываем 4
-    int min_dist_to_obstacle = 4;
 
-    float penalty_rotate = 1.05;
-    float penalty_backwards = 2.0;
-    float penalty_forward = 0.2;
+    static int min_dist_to_obstacle = 5;
+
+    static float penalty_rotate = 1.05;
+    static float penalty_backwards = 2.0;
+    static float penalty_forward = 0.2;
 }
 
 

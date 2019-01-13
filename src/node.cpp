@@ -18,18 +18,31 @@ static inline float normalizeHeadingRad(float t) {
 
 const float node::dy[] = { -0.0415893,  0,          0.0415893};
 const float node::dx[] = { 0.705224,    0.7068582,   0.705224};
-const float node::dt[] = { 0.1178097,   0,          -0.1178097};
+const float node::dt[] = { 0.35,        0,           -0.35};
 
 
 //тут же сразу считаем g
-node::node(float x, float y, float t, int dir, float g):
+//TODO: пиздец с указателями
+node::node(float x, float y, float t, int dir, std::shared_ptr<node> prev):
 x(x),
 y(y),
 t(t),
-g(g),
 dir(dir)
 {
-///у первой ноды -1
+    open = false;
+    close = false;
+
+    if (prev) {
+        g = prev->g;
+        h = prev->h;
+    }
+
+    else {
+        g = 0;
+        h = 0;
+    }
+
+
     if (dir > 0) {
 
         if (dir > 3)
@@ -39,10 +52,27 @@ dir(dir)
             this->g += config::penalty_rotate;
     }
 
-    conctruct_neighbours();
+    this->prev = prev;
 }
 
-void node::construct_neigbour_dir(int dir) {
+node::node(const node &other) :
+x(other.x),
+y(other.y),
+t(other.t),
+g(other.g),
+h(other.h)
+{
+}
+
+float node::get_x() {
+    return x;
+}
+
+float node::get_y() {
+    return y;
+}
+
+std::shared_ptr<node> node::construct_neigbour_dir(int dir) {
     float new_x;
     float new_y;
     float new_t;
@@ -59,15 +89,42 @@ void node::construct_neigbour_dir(int dir) {
         new_y = y - dx[dir - 3] * sin(t) + dy[dir - 3] * cos(t);
         new_t = normalizeHeadingRad(t - dt[dir - 3]);
     }
-
-    std::shared_ptr<node> neigbour(new node(new_x, new_y, new_t, dir, g));
-    neighbours.emplace(neigbour->get_g(), std::weak_ptr<node>(neigbour));
+    std::shared_ptr<node> neigbour(new node(new_x, new_y, new_t, dir, shared_from_this()));
+    return neigbour;
 }
 
-void node::conctruct_neighbours(){
-    for (int i = 0; i < 6; i ++) {
-        construct_neigbour_dir(i);
-    }
+void node::set_h(float h) {
+    this->h += h;
+}
+
+int node::get_dir(){
+    this->dir;
+}
+
+float node::get_f() const {
+    return h + g;
+}
+
+void node::close_n() {
+    close = true;
+    open = false;
+}
+
+void node::open_() {
+    open = true;
+    close = false;
+}
+
+bool node::is_closed() {
+    return close;
+}
+
+bool node::is_open() {
+    return open;
+}
+
+bool node::is_start() {
+    return (!prev && dir < 0);
 }
 
 float node::get_g() {

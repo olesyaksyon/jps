@@ -10,25 +10,13 @@
 #include <map>
 #include <functional>
 
-class node;
-
-class own_double_less : public std::binary_function<float,std::weak_ptr<node>,bool>
-{
-public:
-    own_double_less( float arg_ = 1e-7 ) : epsilon(arg_) {}
-    bool operator()( const float &left, const float &right  ) const
-    {
-        return (abs(left - right) > epsilon) && (left < right);
-    }
-    double epsilon;
-};
 
 ///dirs
 ///3         0
 ///4  point  1
 ///5         2
 
-class node {
+class node : public std::enable_shared_from_this<node>{
     float x;
     float y;
     float t;
@@ -36,22 +24,39 @@ class node {
     float g;
     float h;
 
+
+    std::shared_ptr<node> prev;
+
     int dir;///направление относительно последней ноды
 
     static const float dx[];
     static const float dy[];
     static const float dt[];
 
-
-    ///array
+    bool close;
+    bool open;
 
 public:
-    std::map<float, std::weak_ptr<node>, own_double_less> neighbours;
 
-    node(float x, float y, float t, int dir, float g);
-    void conctruct_neighbours();
-    void construct_neigbour_dir(int dir);
+
+    node(float x, float y, float t, int dir, std::shared_ptr<node> prev);
+    node(const node &other);
+
+    std::shared_ptr<node> construct_neigbour_dir(int dir);
+
     float get_g();
+    void set_h(float h);
+    float get_f() const;
+    float get_x();
+    float get_y();
+    int get_dir();
+
+    void close_n();
+    void open_();
+
+    bool is_closed();
+    bool is_open();
+    bool is_start();
 };
 
 
