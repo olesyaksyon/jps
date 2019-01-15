@@ -22,30 +22,29 @@ struct node_cmp {
 };
 
 class algo {
-    shared_ptr_node start;
-    shared_ptr_node goal;
+    weak_ptr_node start;
+    weak_ptr_node goal;
     nav_msgs::OccupancyGrid::Ptr grid;
+    int possible_dirs;
 
-    std::list<std::weak_ptr<node>> path;
+    //std::list<std::weak_ptr<node>> path;
 
 public:
     algo();
     void init(geometry_msgs::PoseWithCovarianceStamped start, geometry_msgs::PoseStamped goal, nav_msgs::OccupancyGrid::Ptr grid);
     float distance_to_goal(shared_ptr_node curr_);
-    float distance_to_start(shared_ptr_node curr_);
 
-    void prune_neibours(shared_ptr_node curr_, std::priority_queue<node, std::vector<weak_ptr_node>, node_cmp> &);
+    void prune_neibours(shared_ptr_node curr_, std::priority_queue<node, std::vector<shared_ptr_node>, node_cmp> & open_);
     float get_goal_distance(shared_ptr_node curr_);
-    void simple_a_star(std::priority_queue<node, std::vector<shared_ptr_node>, node_cmp>& open_, shared_ptr_node curr_);
 
 
     bool is_on_grid(shared_ptr_node curr_);
     bool is_traversible(shared_ptr_node curr_);
 
-    std::shared_ptr<node> choose_direction(shared_ptr_node curr_);
     shared_ptr_node jps();
-    bool is_dominant(shared_ptr_node curr, shared_ptr_node next);
+    bool is_force(shared_ptr_node curr, shared_ptr_node next);
     void jump(shared_ptr_node& curr_n);
+    void identify_successors(shared_ptr_node curr_, std::priority_queue<node, std::vector<shared_ptr_node>, node_cmp> & open_);
     void clear();
 
 };
