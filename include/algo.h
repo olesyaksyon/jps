@@ -34,7 +34,7 @@ public:
     void init(geometry_msgs::PoseWithCovarianceStamped start, geometry_msgs::PoseStamped goal, nav_msgs::OccupancyGrid::Ptr grid);
     float distance_to_goal(shared_ptr_node curr_);
 
-    void prune_neibours(shared_ptr_node curr_, std::priority_queue<node, std::vector<shared_ptr_node>, node_cmp> & open_);
+    void prune_neibours(shared_ptr_node curr_, std::vector<shared_ptr_node> &neighbours);
     float get_goal_distance(shared_ptr_node curr_);
 
 

@@ -42,14 +42,14 @@ public:
     float get_g();
     void set_h(float h);
     float get_f() const;
-    float get_x();
-    float get_y();
+    int get_x();
+    int get_y();
     int get_dir();
     int get_idx();
     std::shared_ptr<node> get_prev();
 
     void close_n();
-    void open_();
+    void open_n();
     void set_idx(int idx);
 
     bool is_closed();

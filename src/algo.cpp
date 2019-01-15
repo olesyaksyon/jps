@@ -23,15 +23,11 @@ bool algo::is_on_grid(shared_ptr_node curr_) {
 bool algo::is_traversible(shared_ptr_node curr_) {
     std::shared_ptr<node> exper_node = curr_;
 
-    for (int i = 0; i < config::min_dist_to_obstacle; i ++) {
-        exper_node = exper_node->construct_neigbour_dir(1);
-    }
-
-    int x = int(exper_node->get_x());
-    int y = int(exper_node->get_y());
-
-    if (x < 0 || y < 0 || x > grid->info.width || y > grid->info.height)
+    if (is_on_grid(curr_))
         return false;
+
+    int x = curr_->get_x();
+    int y = curr_->get_y();
 
     if (grid->data[x + y * grid->info.height] > 0)
         return false;
@@ -49,7 +45,7 @@ float distance_betw_nodes(shared_ptr_node node1, shared_ptr_node node2){
 }
 
 
-void algo::prune_neibours(shared_ptr_node curr_, std::priority_queue<node, std::vector<shared_ptr_node>, node_cmp> & open_) {
+void algo::prune_neibours(shared_ptr_node curr_, std::vector<shared_ptr_node> &neighbours) {
     auto prev = curr_->get_prev();
 
     int dir1 = prev->get_dir() - 1;
@@ -75,7 +71,7 @@ void algo::prune_neibours(shared_ptr_node curr_, std::priority_queue<node, std::
         if (len_without_x1 < len_with_x || len_withous_x2 < len_with_x)
             continue;
         else
-            open_.push(neighbour);
+            neighbours.push_back(neighbour);
     }
 }
 
@@ -86,18 +82,17 @@ void algo::init(geometry_msgs::PoseWithCovarianceStamped start_, geometry_msgs::
 }
 
 void algo::jump(shared_ptr_node& curr_n){
+    curr_n = curr_n->construct_neigbour_dir(curr_n->get_dir());
     if (distance_to_goal(curr_n) < 0.001)
         return;
 
-    if (!is_on_grid(curr_n) || !is_traversible(curr_n))
+    if ( !is_traversible(curr_n))
         curr_n = nullptr;
 
     auto neihbour = curr_n->construct_neigbour_dir(curr_n->get_dir());
-    neihbour->set_h(distance_to_goal(neihbour));
 
-    if (neihbour->get_f() - curr_n->get_f() < 0.8) {
-        jump(neihbour);
-    }
+    if (!is_traversible(neihbour))
+        return;
 
 }
 
@@ -105,12 +100,27 @@ void algo::identify_successors(shared_ptr_node curr_, std::priority_queue<node, 
     if (curr_->is_start()) {
         for (int i = 0; i < possible_dirs; i ++) {
             auto neighbour = curr_->construct_neigbour_dir(i);
-            open_.push(curr_);
+            neighbour->open_n();
+            neighbour->set_h(distance_to_goal(neighbour));
+            open_.push(neighbour);
         }
-    } else {
-        prune_neibours(curr_, open_);
     }
 
+    else {
+        std::vector <shared_ptr_node> neighbours;
+        prune_neibours(curr_, neighbours);
+
+        for (auto n = neighbours.begin(); n != neighbours.end(); n ++ ) {
+            shared_ptr_node neighbour = *n;
+            jump(neighbour);
+
+            if (neighbour) {
+                neighbour->open_n();
+                neighbour->set_h(distance_to_goal(neighbour));
+                open_.push(neighbour);
+            }
+        }
+    }
 }
 
 
@@ -126,10 +136,16 @@ shared_ptr_node algo::jps(){
 
     while (!open_.empty()) {
         shared_ptr_node curr_ = open_.top();
-        open_.pop();
-        curr_->close_n();
+
         curr_->set_idx(curr_->get_x() + curr_->get_y() * (int)grid->info.width);
         inited_node.emplace(curr_->get_idx(), curr_);
+
+        if (distance_to_goal(curr_) < 0.01)
+            return curr_;
+
+        open_.pop();
+        curr_->close_n();
+        identify_successors(curr_, open_);
     }
     return nullptr;
 }

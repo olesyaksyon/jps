@@ -71,11 +71,11 @@ h(other.h)
 {
 }
 
-float node::get_x() {
+int node::get_x() {
     return x;
 }
 
-float node::get_y() {
+int node::get_y() {
     return y;
 }
 
@@ -127,7 +127,7 @@ void node::close_n() {
     open = false;
 }
 
-void node::open_() {
+void node::open_n() {
     open = true;
     close = false;
 }
