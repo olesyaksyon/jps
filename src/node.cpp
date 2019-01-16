@@ -52,10 +52,18 @@ dir(dir)
             this->g += config::penalty_rotate;
     }*/
 
-    dist_to_prev = sqrt((prev->get_x() - x) * (prev->get_x() - x) + (prev->get_y() - y) * (prev->get_y() - y));
-    g = prev->get_g() + dist_to_prev;
+    if (prev) {
+        dist_to_prev = sqrt((prev->get_x() - x) * (prev->get_x() - x) + (prev->get_y() - y) * (prev->get_y() - y));
+        g = prev->get_g() + dist_to_prev;
 
-    this->prev = prev;
+        this->prev = prev;
+    }
+
+    else {
+        dist_to_prev = 0;
+        g = 0;
+    }
+
 }
 
 void node::set_idx(int idx){

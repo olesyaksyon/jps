@@ -136,14 +136,20 @@ shared_ptr_node algo::jps(){
 
     while (!open_.empty()) {
         shared_ptr_node curr_ = open_.top();
+        open_.pop();
 
-        curr_->set_idx(curr_->get_x() + curr_->get_y() * (int)grid->info.width);
-        inited_node.emplace(curr_->get_idx(), curr_);
+        int idx = curr_->get_x() + curr_->get_y() * grid->info.width;
+        curr_->set_idx(idx);
+
+        if (inited_node.find(idx) == inited_node.end())
+            inited_node.emplace(curr_->get_idx(), curr_);
+        else {
+            continue;
+        }
 
         if (distance_to_goal(curr_) < 0.01)
             return curr_;
 
-        open_.pop();
         curr_->close_n();
         identify_successors(curr_, open_);
     }

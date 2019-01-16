@@ -27,7 +27,6 @@ class algo {
     nav_msgs::OccupancyGrid::Ptr grid;
     int possible_dirs;
 
-    //std::list<std::weak_ptr<node>> path;
 
 public:
     algo();
