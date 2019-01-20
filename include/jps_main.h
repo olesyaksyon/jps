@@ -53,15 +53,13 @@ class jps_main {
     visualization_msgs::MarkerArray pathVehicles;
 
     algo algo_;
-
-
+    //path handler
 
 public:
     jps_main();
-    void publish_topic();
+    void addVehicle(shared_ptr_node node, int i);
+    void addSegment(shared_ptr_node node);
     void process();
-
-    void get_path(shared_ptr_node last);
 
     void set_map(const nav_msgs::OccupancyGrid::Ptr map);
     void set_start(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& start);

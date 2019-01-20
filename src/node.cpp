@@ -6,17 +6,9 @@
 #include "node.h"
 #include "config.h"
 
-static inline float normalizeHeadingRad(float t) {
-    if (t < 0) {
-        t = t - 2.f * M_PI * (int)(t / (2.f * M_PI));
-        return 2.f * M_PI + t;
-    }
 
-    return t - 2.f * M_PI * (int)(t / (2.f * M_PI));
-}
-
-const int node::dx[] = { 1, 1,  1,  0, -1, -1, -1};
-const int node::dy[] = { 1, 0, -1, -1, -1,  0,  1};
+const int node::dx[] = { 1, 1,  1,  0, -1, -1, -1, 1};
+const int node::dy[] = { 1, 0, -1, -1, -1,  0,  1, 0};
 
 
 
@@ -30,32 +22,15 @@ dir(dir)
     open = false;
     close = false;
 
-    //idx = x + y * width;
-
-    /*if (prev) {
-        g = prev->g;
-        h = prev->h;
-    }
-
-    else {
-        g = 0;
-        h = 0;
-    }
-
-
-    if (dir > 0) {
-
-        if (dir > 3)
-            this->g += config::penalty_backwards;
-
-        if (dir == 3 || dir == 5 || dir == 0 || dir == 2)
-            this->g += config::penalty_rotate;
-    }*/
-
     if (prev) {
         dist_to_prev = sqrt((prev->get_x() - x) * (prev->get_x() - x) + (prev->get_y() - y) * (prev->get_y() - y));
-        g = prev->get_g() + dist_to_prev;
 
+        if (!dir%2) {
+            g = prev->get_g() + dist_to_prev * config::penalty_rotate;
+        }
+
+        else
+            g = prev->get_g() + dist_to_prev;
         this->prev = prev;
     }
 
@@ -91,6 +66,10 @@ int node::get_idx() {
     return idx;
 }
 
+float node::get_h(){
+    return h;
+}
+
 std::shared_ptr<node> node::construct_neigbour_dir(int dir) {
     int new_x = x + dx[dir];
     int new_y = y + dy[dir];
@@ -109,13 +88,13 @@ std::shared_ptr<node> node::construct_neigbour_dir(int dir) {
         new_t = normalizeHeadingRad(t - dt[dir - 3]);
     }*/
 
-
-    std::shared_ptr<node> neigbour(new node(new_x, new_y, dir, shared_from_this()));
+    std::shared_ptr<node> ex = shared_from_this();
+    std::shared_ptr<node> neigbour(new node(new_x, new_y, dir, ex));
     return neigbour;
 }
 
 std::shared_ptr<node> node::get_prev(){
-    return prev.lock();
+    return prev;
 }
 
 void node::set_h(float h) {
@@ -123,7 +102,7 @@ void node::set_h(float h) {
 }
 
 int node::get_dir(){
-    this->dir;
+    return dir;
 }
 
 float node::get_f() const {
@@ -149,7 +128,7 @@ bool node::is_open() {
 }
 
 bool node::is_start() {
-    return (prev.expired() && dir < 0);
+    return (!prev && dir < 0);
 }
 
 float node::get_g() {

@@ -22,8 +22,8 @@ struct node_cmp {
 };
 
 class algo {
-    weak_ptr_node start;
-    weak_ptr_node goal;
+    shared_ptr_node start;
+    shared_ptr_node goal;
     nav_msgs::OccupancyGrid::Ptr grid;
     int possible_dirs;
 
@@ -34,14 +34,12 @@ public:
     float distance_to_goal(shared_ptr_node curr_);
 
     void prune_neibours(shared_ptr_node curr_, std::vector<shared_ptr_node> &neighbours);
-    float get_goal_distance(shared_ptr_node curr_);
 
 
     bool is_on_grid(shared_ptr_node curr_);
     bool is_traversible(shared_ptr_node curr_);
 
     shared_ptr_node jps();
-    bool is_force(shared_ptr_node curr, shared_ptr_node next);
     void jump(shared_ptr_node& curr_n);
     void identify_successors(shared_ptr_node curr_, std::priority_queue<node, std::vector<shared_ptr_node>, node_cmp> & open_);
     void clear();

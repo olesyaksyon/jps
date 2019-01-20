@@ -17,11 +17,9 @@ class node : public std::enable_shared_from_this<node>{
     float g;
     float h;
 
-
-
     int idx;
 
-    std::weak_ptr<node> prev;
+    std::shared_ptr<node> prev;
 
     int dir;///направление относительно последней ноды
     static const int dx[];
@@ -40,6 +38,7 @@ public:
     std::shared_ptr<node> construct_neigbour_dir(int dir);
 
     float get_g();
+    float get_h();
     void set_h(float h);
     float get_f() const;
     int get_x();
