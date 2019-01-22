@@ -37,7 +37,7 @@ set(SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/src/algo.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/node.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp
-        )
+        src/robot.cpp include/robot.h)
 
 include_directories(
         include

@@ -18,6 +18,9 @@ jps_main::jps_main(){
 
     path.header.frame_id = "path";
 
+    start = NULL;
+    goal = NULL;
+
 }
 
 void jps_main::addVehicle(shared_ptr_node node, int i) {
@@ -64,7 +67,9 @@ void jps_main::addSegment(shared_ptr_node node) {
 void jps_main::process() {
     algo_.clear();
     path.poses.clear();
-    algo_.init(start, goal, grid);
+
+    if (start && goal)
+        algo_.init(start, goal, grid);
     std::shared_ptr<node> last = algo_.jps();
 
     while (last != nullptr) {
@@ -85,7 +90,7 @@ void jps_main::set_map(const nav_msgs::OccupancyGrid::Ptr map){
 
 
 void jps_main::set_start(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& start) {
-    this->start = *start;
+    this->start = start;
 
     geometry_msgs::PoseStamped start_;
     start_.pose.position = start->pose.pose.position;
@@ -102,7 +107,7 @@ void jps_main::set_start(const geometry_msgs::PoseWithCovarianceStamped::ConstPt
 
 void jps_main::set_goal(const geometry_msgs::PoseStamped::ConstPtr& goal) {
     ROS_INFO("goal taken");
-    this->goal = *goal;
+    this->goal = goal;
 
     process();
 }

@@ -14,6 +14,8 @@
 #include <visualization_msgs/MarkerArray.h>
 #include <algo.h>
 
+
+///класс для взаимодействия с ROS и запуска параметров
 class jps_main {
 
     ///==============All needed ros vars==========================
@@ -34,9 +36,9 @@ class jps_main {
     /// A pointer to the grid the planner runs on
     nav_msgs::OccupancyGrid::Ptr grid;
     /// The start pose set through RViz
-    geometry_msgs::PoseWithCovarianceStamped start;
+    geometry_msgs::PoseWithCovarianceStamped::ConstPtr start;
     /// The goal pose set through RViz
-    geometry_msgs::PoseStamped goal;
+    geometry_msgs::PoseStamped::ConstPtr goal;
 
 
 

@@ -11,6 +11,7 @@
 #include <geometry_msgs/PoseStamped.h>
 #include <memory>
 #include <queue>
+#include <robot.h>
 
 typedef std::weak_ptr<node> weak_ptr_node;
 typedef std::shared_ptr<node> shared_ptr_node;
@@ -21,23 +22,21 @@ struct node_cmp {
     }
 };
 
+///основной алгоритм
 class algo {
     shared_ptr_node start;
     shared_ptr_node goal;
     nav_msgs::OccupancyGrid::Ptr grid;
     int possible_dirs;
+    robot robot_;
 
 
 public:
     algo();
-    void init(geometry_msgs::PoseWithCovarianceStamped start, geometry_msgs::PoseStamped goal, nav_msgs::OccupancyGrid::Ptr grid);
+    void init(geometry_msgs::PoseWithCovarianceStamped::ConstPtr start, geometry_msgs::PoseStamped::ConstPtr goal, nav_msgs::OccupancyGrid::Ptr grid);
     float distance_to_goal(shared_ptr_node curr_);
 
     void prune_neibours(shared_ptr_node curr_, std::vector<shared_ptr_node> &neighbours);
-
-
-    bool is_on_grid(shared_ptr_node curr_);
-    bool is_traversible(shared_ptr_node curr_);
 
     shared_ptr_node jps();
     void jump(shared_ptr_node& curr_n);

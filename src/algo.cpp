@@ -8,48 +8,14 @@
 #include <config.h>
 #include <unordered_map>
 
-algo::algo(){
+
+algo::algo() : robot_(config::width, config::length, config::R){
     grid = NULL;
     possible_dirs = config::possible_dirs;
     start = NULL;
     goal = NULL;
 }
 
-bool algo::is_on_grid(shared_ptr_node curr_) {
-    float curr_x = curr_->get_x();
-    float curr_y = curr_->get_y();
-    return (curr_x >= 0 && curr_y >= 0 && curr_x < grid->info.width && curr_y < grid->info.height);
-}
-
-
-bool algo::is_traversible(shared_ptr_node curr_) {
-    std::shared_ptr<node> exper_node = curr_;
-
-    if (!is_on_grid(curr_))
-        return false;
-
-    int x = curr_->get_x();
-    int y = curr_->get_y();
-
-    int offset = 3;
-
-    if (grid->data[x + y * grid->info.width])
-        return false;
-
-    //это hot-fix, я потом перепишу этот код нормально
-    for (int i = 1; i < offset; i ++) {
-        if (grid->data[x + offset + (y + offset) * grid->info.width] || grid->data[x + (y + offset) * grid->info.width] || grid->data[x + offset + y * grid->info.width])
-            return false;
-
-        if (x > 3 && y > 3) {
-            if (grid->data[x - offset + (y - offset) * grid->info.width] || grid->data[x + (y - offset) * grid->info.width] || grid->data[x - offset + y * grid->info.width])
-                return false;
-        }
-
-    }
-
-    return true;
-}
 
 
 float algo::distance_to_goal(shared_ptr_node curr_){
@@ -66,23 +32,19 @@ void algo::prune_neibours(shared_ptr_node curr_, std::vector<shared_ptr_node> &n
 
     int dir = curr_->get_dir() - 1;
 
-    if (dir < 0)
-        dir = possible_dirs - 1;
-
-    dirs.push_back(dir);
+    if (dir > 0)
+        dirs.push_back(dir);
 
     dir = curr_->get_dir() + 1;
 
-    if (dir >= possible_dirs)
-        dir = 0;
-
-    dirs.push_back(dir);
+    if ((curr_->get_dir() < 3 && dir < possible_dirs / 2) || (curr_->get_dir() > 2 && dir > 2 && dir < possible_dirs))
+        dirs.push_back(dir);
 
 
     for (int i = 0; i < possible_dirs; i ++) {
         auto neighbour = curr_->construct_neigbour_dir(i);
 
-        if (!is_traversible(neighbour))
+        if (!robot_.is_traversible(neighbour))
             continue;
 
         float len_with_x = curr_->dist_to_prev + neighbour->dist_to_prev;
@@ -99,42 +61,44 @@ void algo::prune_neibours(shared_ptr_node curr_, std::vector<shared_ptr_node> &n
     }
 }
 
-void algo::init(geometry_msgs::PoseWithCovarianceStamped start, geometry_msgs::PoseStamped goal, nav_msgs::OccupancyGrid::Ptr grid){
+void algo::init(geometry_msgs::PoseWithCovarianceStamped::ConstPtr start, geometry_msgs::PoseStamped::ConstPtr goal, nav_msgs::OccupancyGrid::Ptr grid){
     this->grid = grid;
 
-    int x = static_cast<int>(start.pose.pose.position.x);
-    int y = static_cast<int>(start.pose.pose.position.y);
+    float x = start->pose.pose.position.x;
+    float y = start->pose.pose.position.y;
+    float t = tf::getYaw(start->pose.pose.orientation);
 
-    this->start = std::make_shared<node>(x, y, -1, nullptr);
+    this->start = std::make_shared<node>(x, y, t, -1, nullptr);
 
-    x = static_cast<int>(goal.pose.position.x);
-    y = static_cast<int>(goal.pose.position.y);
+    x = goal->pose.position.x;
+    y = goal->pose.position.y;
+    t = tf::getYaw(goal->pose.orientation);
 
-    this->goal = std::make_shared<node>(x, y, -1, nullptr);
+    this->goal = std::make_shared<node>(x, y, t, -1, nullptr);
 }
 
 void algo::jump(shared_ptr_node& curr_n){
-    curr_n = curr_n->construct_neigbour_dir(curr_n->get_dir());
+    curr_n = curr_n->construct_neigbour_dir(1);
     curr_n->set_h(distance_to_goal(curr_n));
 
-    if ( !is_traversible(curr_n)) {
+    if ( !robot_.is_traversible(curr_n)) {
         curr_n = nullptr;
         return;
     }
 
-    if (distance_to_goal(curr_n) < 0.001)
+    if (distance_to_goal(curr_n) < 0.05)
         return;
 
     auto neihbour = curr_n->construct_neigbour_dir(curr_n->get_dir());
-    if (!is_traversible(neihbour) || curr_n->get_prev()->get_h() < curr_n->get_h()) {
+    if (!robot_.is_traversible(neihbour) || abs(static_cast<int>(curr_n->get_prev()->get_h()) - static_cast<int>(curr_n->get_h())) > 1) {
         neihbour = NULL;
         return;
     }
 
-    if (!(curr_n->get_dir()%2)) {
+    /*if (!(curr_n->get_dir()%2)) {
         int dir1 = curr_n->get_dir() - 1;
         if (dir1 < 0)
-            dir1 = 7;
+            dir1 = 6;
 
         int dir2 = curr_n->get_dir() + 1;
 
@@ -146,7 +110,7 @@ void algo::jump(shared_ptr_node& curr_n){
 
         if (neighbour1 && neighbour2)
             return;
-    }
+    }*/
 
     jump(curr_n);
 }
@@ -184,7 +148,9 @@ shared_ptr_node algo::jps(){
         return nullptr;
     }
 
-    if (!is_traversible(start) || !is_traversible(goal)) {
+    robot_.init(grid, start);
+
+    if (!robot_.is_inited() || !robot_.is_traversible(goal)) {
         ROS_INFO("start or goal is in obstacle or out map");
         return nullptr;
     }
@@ -198,10 +164,10 @@ shared_ptr_node algo::jps(){
         shared_ptr_node curr_ = open_.top();
         open_.pop();
 
-        if (!is_traversible(curr_))
+        if (!robot_.is_traversible(curr_))
             continue;
 
-        int idx = curr_->get_x() + curr_->get_y() * grid->info.width;
+        int idx = static_cast<int>(curr_->get_t() / config::deltaHeadingRad * grid->info.width * grid->info.height + curr_->get_x() + curr_->get_y() * grid->info.width);
         curr_->set_idx(idx);
 
         if (inited_node.find(idx) == inited_node.end())
@@ -209,7 +175,7 @@ shared_ptr_node algo::jps(){
         else
             continue;
 
-        if (distance_to_goal(curr_) < 0.01)
+        if (distance_to_goal(curr_) < 0.5)
             return curr_;
 
         curr_->close_n();

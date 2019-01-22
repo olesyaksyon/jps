@@ -5,18 +5,23 @@
 #ifndef JPS_CONFIG_H
 #define JPS_CONFIG_H
 
+#include <cmath>
+
 namespace config {
 
-    static int R = 6;
+    static int R = 3;
     static int width = 1.75;
     static int length = 2.75;
-    static int possible_dirs = 8;
+    static int possible_dirs = 6;
 
     static float penalty_rotate = 1.05;
     static float penalty_backwards = 2.0;
-    static float penalty_forward = 0.2;
+    static float penaltyCOD = 2.0;
 
-    //static constexpr color teal = {102.f / 255.f, 217.f / 255.f, 239.f / 255.f};
+    static int headings = 36;
+    static float deltaHeadingDeg = 360 / (float)headings;
+    static float deltaHeadingRad = 2 * M_PI / (float)headings;
+    static const float deltaHeadingNegRad = 2 * M_PI - deltaHeadingRad;
 }
 
 
